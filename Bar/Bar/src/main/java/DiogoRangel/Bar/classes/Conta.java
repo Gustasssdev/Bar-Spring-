@@ -1,5 +1,6 @@
 package DiogoRangel.Bar.classes;
 
+import DiogoRangel.Bar.exception.PagamentoMaior;
 import DiogoRangel.Bar.model.Cliente;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -41,13 +42,13 @@ public class Conta {
     // REGRAS DE NEGÓCIO (iguais à sua versão)
     // ------------------------------------------
 
-    public void adicionarPedido(ItemCardapio item, int quantidade) {
+  /*  public void adicionarPedido(ItemCardapio item, int quantidade) {
         if (!this.estaAberta)
             throw new RuntimeException("Conta fechada.");
 
         Consumo consumo = new Consumo(item, quantidade, this);
         consumos.add(consumo);
-    }
+    }*/
 
     public double calcularGorjeta() {
         double gorjeta = 0.0;
@@ -77,18 +78,16 @@ public class Conta {
         return calcularTotalConsumido() + calcularGorjeta();
     }
 
-    public double getValorPendente() {
+    public double getValorPendente() throws PagamentoMaior{
+        if (getTotalPago() > getValorTotalDaConta()){
+            throw new PagamentoMaior("O pagamento é maior do que a conta");
+        }
         return getValorTotalDaConta() - getTotalPago();
     }
 
-    public void registrarPagamento(double valor) {
-        if (valor > getValorPendente()) {
-            throw new RuntimeException("Pagamento maior que a dívida.");
-        }
-        pagamentos.add(valor);
-    }
-
     public void fecharConta() {
-        this.estaAberta = false;
+        if(getValorPendente() == 0){
+            this.estaAberta = false;
+        }
     }
 }

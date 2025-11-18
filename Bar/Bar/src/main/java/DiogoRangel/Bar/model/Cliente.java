@@ -22,3 +22,8 @@ public class Cliente {
         this.cpf = cpf;
     }
 }
+
+/*
+O cliente tem que ver as informações da conta da mesa
+ou seja se tiver em uma mesa 3 contas ele dever ver as informações dessas contas, em sequencia
+ */

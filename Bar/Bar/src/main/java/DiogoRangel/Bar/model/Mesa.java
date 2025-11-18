@@ -22,7 +22,7 @@ public class Mesa {
 
     private double couvert = 0;
 
-    private boolean ativa = true;
+    private boolean contaAtiva = true;
 
     public Mesa() {}
 

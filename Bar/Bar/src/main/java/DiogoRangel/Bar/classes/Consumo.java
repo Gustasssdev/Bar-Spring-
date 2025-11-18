@@ -2,6 +2,7 @@ package DiogoRangel.Bar.classes;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 public class Consumo {
