@@ -6,6 +6,7 @@ import DiogoRangel.Bar.classes.ItemCardapio;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter; // Adicionado para permitir o Garçom manipular o status
 
 @Entity
 public class Consumo {
