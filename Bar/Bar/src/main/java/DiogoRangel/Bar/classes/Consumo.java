@@ -1,5 +1,8 @@
 package DiogoRangel.Bar.classes;
 
+import DiogoRangel.Bar.enums.StatusConsumo;
+import DiogoRangel.Bar.exception.*; // Importe a sua exception
+import DiogoRangel.Bar.classes.ItemCardapio;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
