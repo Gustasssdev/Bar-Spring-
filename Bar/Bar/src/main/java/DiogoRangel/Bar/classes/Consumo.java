@@ -30,6 +30,10 @@ public class Consumo {
     }
 
     public double getValorTotal() {
+        if (this.status == StatusConsumo.CANCELADO) {
+            return 0.0;
+        }
+        // Utiliza o método getValor() que você já definiu
         return item.getValor() * quantidade;
     }
 
