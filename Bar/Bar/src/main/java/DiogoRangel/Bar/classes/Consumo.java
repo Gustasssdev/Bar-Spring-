@@ -33,6 +33,7 @@ public class Consumo {
         this.item = item;
         this.quantidade = quantidade;
         this.conta = conta;
+        this.status = StatusConsumo.PEDIDO;
     }
 
     public double getValorTotal() {
