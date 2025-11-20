@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter; // Adicionado para permitir o Garçom manipular o status
 
 @Entity
+@Getter @Setter
+
 public class Consumo {
 
     @Id
