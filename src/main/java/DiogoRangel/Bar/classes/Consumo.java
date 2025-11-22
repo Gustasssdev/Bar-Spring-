@@ -1,0 +1,59 @@
+package DiogoRangel.Bar.classes;
+
+import DiogoRangel.Bar.enums.StatusConsumo;
+import DiogoRangel.Bar.exception.*;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity
+@Getter @Setter
+
+public class Consumo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    private Conta conta;
+
+    @ManyToOne
+    private ItemCardapio item;
+
+    private int quantidade;
+
+    // --- Novos Atributos para Cancelamento ---
+
+    @Enumerated(EnumType.STRING)
+    private StatusConsumo status = StatusConsumo.PEDIDO;
+
+    // Requisito: "com motivo"
+    private String motivoCancelamento;
+
+    public void cancelar(String motivo) {
+        if (motivo == null || motivo.trim().isEmpty()) {
+            throw new DadosInvalidos("O motivo do cancelamento é obrigatório.");
+        }
+        if (this.status == StatusConsumo.CANCELADO) {
+            throw new IllegalStateException("Este consumo já está cancelado.");
+        }
+
+        this.status = StatusConsumo.CANCELADO;
+        this.motivoCancelamento = motivo;
+    }
+
+    public Consumo(ItemCardapio item, int quantidade, Conta conta) {
+        this.item = item;
+        this.quantidade = quantidade;
+        this.conta = conta;
+        this.status = StatusConsumo.PEDIDO;
+    }
+
+    public double getValorTotal() {
+        if (this.status == StatusConsumo.CANCELADO) {
+            return 0.0;
+        }
+        return item.getValor() * quantidade;
+    }
+}
