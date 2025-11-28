@@ -1,4 +1,4 @@
-package DiogoRangel.Bar.Controller;
+package DiogoRangel.Bar.controller;
 
 import DiogoRangel.Bar.model. Cliente;
 import DiogoRangel.Bar.service.ClienteService;
