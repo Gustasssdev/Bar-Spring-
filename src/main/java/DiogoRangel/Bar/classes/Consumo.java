@@ -56,4 +56,8 @@ public class Consumo {
         }
         return item.getValor() * quantidade;
     }
+
+    public boolean isCancelado(){
+        return this.status == StatusConsumo.CANCELADO;
+    }
 }

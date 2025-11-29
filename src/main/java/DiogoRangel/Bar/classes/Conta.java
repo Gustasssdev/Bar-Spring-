@@ -1,7 +1,7 @@
 package DiogoRangel.Bar.classes;
 
-import DiogoRangel.Bar.exception.PagamentoMaior;
 import DiogoRangel.Bar.model.Cliente;
+import DiogoRangel.Bar.classes.ItemCardapio;
 import DiogoRangel.Bar.model.Mesa;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,8 +31,8 @@ public class Conta {
     @ElementCollection
     private List<Double> pagamentos = new ArrayList<>();
 
-    @ManyToOne // Mapeamento reverso para a relação OneToMany na Mesa
-    private Mesa mesa;
+    @ManyToOne
+    private Mesa mesa; // Assumimos que Mesa tem o numPessoas
 
     public Conta() {}
 
@@ -43,23 +43,17 @@ public class Conta {
         this.estaAberta = true;
     }
 
-  /*  public void adicionarPedido(ItemCardapio item, int quantidade) {
-        if (!this.estaAberta)
-            throw new RuntimeException("Conta fechada.");
-
-        Consumo consumo = new Consumo(item, quantidade, this);
-        consumos.add(consumo);
-    }*/
-
-    public double calcularGorjeta() {
+    public double calcularGorjeta(double percBebida, double percComida) {
         double gorjeta = 0.0;
         for (Consumo consumo : consumos) {
             ItemCardapio item = consumo.getItem();
 
-            if (item.getTipo() == 2) {             // bebida
-                gorjeta += consumo.getValorTotal() * 0.10;
-            } else if (item.getTipo() == 3) {      // comida
-                gorjeta += consumo.getValorTotal() * 0.15;
+            if (item != null) {
+                if (item.getTipo() == 2) {             // bebida
+                    gorjeta += consumo.getValorTotal() * percBebida;
+                } else if (item.getTipo() == 3) {      // comida
+                    gorjeta += consumo.getValorTotal() * percComida;
+                }
             }
         }
         return gorjeta;
@@ -75,20 +69,7 @@ public class Conta {
         return pagamentos.stream().mapToDouble(Double::doubleValue).sum();
     }
 
-    public double getValorTotalDaConta() {
-        return calcularTotalConsumido() + calcularGorjeta();
-    }
-
-    public double getValorPendente() throws PagamentoMaior{
-        if (getTotalPago() > getValorTotalDaConta()){
-            throw new PagamentoMaior("O pagamento é maior do que a conta");
-        }
-        return getValorTotalDaConta() - getTotalPago();
-    }
-
     public void fecharConta() {
-        if(getValorPendente() == 0){
-            this.estaAberta = false;
-        }
+        this.estaAberta = false;
     }
 }

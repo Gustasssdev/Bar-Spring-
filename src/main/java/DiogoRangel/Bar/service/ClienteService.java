@@ -1,11 +1,10 @@
 package DiogoRangel.Bar.service;
 
-import DiogoRangel.Bar.exception.ItemJaCadastrado;
-import DiogoRangel.Bar.model.Cliente;
-import DiogoRangel.Bar.repository.ClienteRepository;
-import DiogoRangel.Bar.exception.DadosInvalidos;
-import DiogoRangel.Bar.exception.ItemInexistente;
-import DiogoRangel.Bar.exception.ItemJaCadastrado;
+import DiogoRangel.Bar.classes.*;
+import DiogoRangel.Bar.dto.*;
+import DiogoRangel.Bar.model.*;
+import DiogoRangel.Bar.exception.*;
+import DiogoRangel.Bar.repository.*;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
@@ -16,10 +15,16 @@ import java.util.List;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final ConfiguracaoRepository configuracaoRepository;
+    private final MesaRepository mesaRepository;
+        private final ContaService contaService;
 
     // Injeção de dependências no construtor
-    public ClienteService(ClienteRepository clienteRepository) {
+    public ClienteService(ClienteRepository clienteRepository, ConfiguracaoRepository configuracaoRepository, MesaRepository mesaRepository, ContaService contaService) {
         this.clienteRepository = clienteRepository;
+        this.configuracaoRepository = configuracaoRepository;
+        this.mesaRepository = mesaRepository;
+        this.contaService = contaService;
     }
 
     public List<Cliente> listarTodos() {
@@ -88,5 +93,30 @@ public class ClienteService {
             throw new ItemInexistente("Cliente não encontrado com id: " + id);
         }
         clienteRepository.deleteById(id);
+    }
+    public ContaDetalhesDTO consultarContaPorToken(String tokenMesa) {
+        Mesa mesa = mesaRepository.findByTokenAndContaAtivaIsTrue(tokenMesa)
+                .orElseThrow(() -> new ItemInexistente("Mesa não encontrada ou conta inativa para o token fornecido."));
+
+        Conta contaAtiva = mesa.getContas().stream()
+                .filter(Conta::isEstaAberta)
+                .findFirst()
+                .orElseThrow(() -> new ItemInexistente("Conta não encontrada ou fechada para esta mesa."));
+
+        int numPessoas = mesa.getNumPessoas();
+        Long contaId = contaAtiva.getId();
+
+        // --- Cálculo dos detalhes para o DTO ---
+        Configuracao config = configuracaoRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Configuração do sistema não encontrada."));
+
+        double valorGorjeta = contaAtiva.calcularGorjeta(config.getPercentualGorjetaBebida(), config.getPercentualGorjetaComida());
+        double valorCouvert = config.getPrecoCouvertPorPessoa() * numPessoas;
+
+        // Reutiliza a lógica de cálculo total e pendente do ContaService
+        double valorTotal = contaService.calcularTotalDaConta(contaId, numPessoas);
+        double valorPendente = contaService.calcularValorPendente(contaId, numPessoas);
+
+        return new ContaDetalhesDTO(contaAtiva, valorTotal, valorPendente, valorGorjeta, valorCouvert);
     }
 }

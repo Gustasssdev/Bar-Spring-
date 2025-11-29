@@ -1,6 +1,7 @@
 package DiogoRangel.Bar. controller;
 
-import DiogoRangel.Bar.dto.ClienteDTO;  // ✅ IMPORT DO PACOTE DTO
+import DiogoRangel.Bar.dto.ClienteDTO;
+import DiogoRangel.Bar.dto.ContaDetalhesDTO;
 import DiogoRangel.Bar.model.Cliente;
 import DiogoRangel.Bar.service.ClienteService;
 import org.springframework.http.HttpStatus;
@@ -52,6 +53,14 @@ public class ClienteController {
     public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody ClienteDTO dto) {
         Cliente cliente = clienteService. atualizar(id, dto. getNome(), dto.getCpf());
         return ResponseEntity.ok(cliente);
+    }
+
+    @GetMapping("/consumo/{tokenMesa}")
+    public ResponseEntity<ContaDetalhesDTO> consultarContaPorToken(@PathVariable String tokenMesa) {
+
+        ContaDetalhesDTO detalhes = clienteService.consultarContaPorToken(tokenMesa);
+
+        return ResponseEntity.ok(detalhes);
     }
 
     // Deletar cliente
