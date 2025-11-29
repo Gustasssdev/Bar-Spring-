@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,12 @@ public class Conta {
 
     @ManyToOne
     private Mesa mesa; // Assumimos que Mesa tem o numPessoas
+
+    @Column(name = "data_abertura", nullable = false)
+    private LocalDateTime dataAbertura = LocalDateTime.now(); // Assume que já existe
+
+    @Column(name = "data_fechamento") // NOVO CAMPO
+    private LocalDateTime dataFechamento;
 
     public Conta() {}
 

@@ -9,7 +9,7 @@ import lombok.Setter;
  @Getter  @Setter
 public class ConsumoDetalheDTO {
     private String nomeItem;
-    private String categoria;
+    private int tipo;
     private int quantidade;
     private double precoUnitario;
     private double subtotal;
@@ -17,7 +17,7 @@ public class ConsumoDetalheDTO {
 
     public ConsumoDetalheDTO(Consumo consumo) {
         this.nomeItem = consumo.getItem().getNome();
-        this.categoria = String.valueOf(consumo.getItem().getTipo());
+        this.tipo = (consumo.getItem().getTipo());
         this.quantidade = consumo.getQuantidade();
         this.precoUnitario = consumo.getItem().getValor();
         this.subtotal = this.quantidade * this.precoUnitario;

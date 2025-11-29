@@ -10,6 +10,8 @@ import DiogoRangel.Bar.exception.PagamentoMaior;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 public class ContaService {
@@ -72,6 +74,7 @@ public class ContaService {
         }
 
         conta.fecharConta();
+        conta.setDataFechamento(LocalDateTime.now()); //Define a data de fechamento
         return contaRepository.save(conta);
     }
 }
