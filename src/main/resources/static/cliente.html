@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar System - Cliente</title>
+    <style>
+        /* Estilos usando paleta de cores para Cliente (amarelo/laranja) */
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+        h1 { color: #ffc107; text-align: center; margin-bottom: 25px; border-bottom: 3px solid #ffc107; padding-bottom: 10px; }
+        h2 { color: #ffc107; margin-top: 30px; margin-bottom: 15px; }
+        .section { margin-bottom: 35px; padding: 20px; border: 1px solid #ffecb3; border-radius: 8px; background-color: #fff8e1; }
+        fieldset { border: 1px solid #ffe082; padding: 15px; border-radius: 6px; margin-top: 15px; }
+        legend { font-weight: bold; color: #ffc107; padding: 0 10px; }
+        label { display: block; margin-top: 10px; font-weight: 600; color: #333; }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: #ffc107; outline: none; box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25); }
+
+        button {
+            background-color: #ffc107;
+            color: #333;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: bold;
+        }
+        button:hover { background-color: #e0a800; transform: translateY(-1px); }
+
+        .result { white-space: pre-wrap; margin-top: 15px; padding: 15px; border: 1px solid #ccc; background-color: #f8f8f8; border-radius: 6px; font-size: 0.9em; max-height: 300px; overflow-y: auto; }
+        .error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+
+        .logout-btn { position: absolute; top: 20px; right: 20px; background-color: #6c757d; color: white; }
+        .logout-btn:hover { background-color: #5a6268; }
+
+        /* Estilo para Tabela de Detalhes da Conta */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ffecb3; padding: 10px; text-align: left; }
+        th { background-color: #ffc107; color: #333; }
+    </style>
+</head>
+<body>
+
+<button class="logout-btn" onclick="window.location.href='index.html'">Voltar ao Login</button>
+
+<div class="container">
+    <h1>Área do Cliente</h1>
+
+    <!-- ============================================== -->
+    <!-- 1. CADASTRO DE CLIENTE -->
+    <!-- POST /api/clientes/cadastrarcliente -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>1. Cadastro de Cliente</h2>
+        <fieldset>
+            <legend>Cadastre-se para iniciar a Conta</legend>
+            <form id="cadastroForm">
+                <div>
+                    <label for="nome">Nome Completo</label>
+                    <input type="text" id="nome" required>
+                </div>
+                <div>
+                    <label for="cpf">CPF</label>
+                    <input type="text" id="cpf" required>
+                </div>
+                <button type="submit">Cadastrar Cliente</button>
+            </form>
+            <div id="cadastroResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 2. CONSULTA DE MESA/CONTA -->
+    <!-- GET /api/clientes/consumo/{tokenMesa} -->
+    <!-- O Controller espera o token e não o número da mesa. -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>2. Consultar Conta da Mesa</h2>
+        <fieldset>
+            <legend>Verifique seus Consumos e Total</legend>
+            <form id="consultaMesaForm">
+                <div>
+                    <label for="tokenMesa">Token de Acesso da Mesa</label>
+                    <input type="text" id="tokenMesa" required>
+                </div>
+                <button type="submit">Consultar Conta</button>
+            </form>
+            <div id="consultaMesaResult" class="result"></div>
+        </fieldset>
+    </div>
+
+</div>
+
+<script>
+    const BASE_URL = 'http://localhost:8080/api';
+    const CLIENTE_BASE_URL = BASE_URL + '/clientes';
+
+    // ===========================================
+    // UTILS
+    // ===========================================
+    function displayResult(elementId, message, isError = false) {
+        const resultDiv = document.getElementById(elementId);
+        resultDiv.innerHTML = message; // Usamos innerHTML para permitir tabelas
+        resultDiv.className = 'result ' + (isError ? 'error' : 'success');
+        resultDiv.scrollTop = resultDiv.scrollHeight;
+    }
+
+    // Adaptado para receber ContaDetalhesDTO
+    function formatarConta(conta) {
+        let itemsHtml = '<tr><td colspan="3">Nenhum item consumido ainda.</td></tr>';
+        if (conta.itensConsumidos && conta.itensConsumidos.length > 0) {
+            itemsHtml = conta.itensConsumidos.map(item => `
+                <tr>
+                    <td>${item.nome || 'Item Desconhecido'}</td>
+                    <td>${item.quantidade || 1}</td>
+                    <td>R$ ${(item.precoUnitario * item.quantidade).toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        return `
+            <h3>Detalhes da Conta #${conta.id || 'N/A'} - Mesa ${conta.numeroMesa || 'N/A'}</h3>
+            <p><strong>Status:</strong> ${conta.status || 'ABERTA'}</p>
+            <p><strong>Número de Pessoas:</strong> ${conta.numPessoas || 'N/A'}</p>
+
+            <h4 style="margin-top: 15px;">Itens Consumidos:</h4>
+            <table>
+                <thead>
+                    <tr><th>Item</th><th>Qtd</th><th>Subtotal</th></tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+            </table>
+
+            <h4 style="margin-top: 15px;">Resumo Financeiro:</h4>
+            <p>Subtotal (Produtos): R$ ${conta.subtotalProdutos ? conta.subtotalProdutos.toFixed(2) : '0.00'}</p>
+            <p>Gorjeta (Bebida): R$ ${conta.valorGorjetaBebida ? conta.valorGorjetaBebida.toFixed(2) : '0.00'}</p>
+            <p>Gorjeta (Comida): R$ ${conta.valorGorjetaComida ? conta.valorGorjetaComida.toFixed(2) : '0.00'}</p>
+            <p>Couvert Artístico: R$ ${conta.valorCouvert ? conta.valorCouvert.toFixed(2) : '0.00'}</p>
+            <hr>
+            <h3 style="color: #8B0000;">Total a Pagar: R$ ${conta.valorTotal ? conta.valorTotal.toFixed(2) : '0.00'}</h3>
+        `;
+    }
+
+    // ===========================================
+    // 1. CADASTRO DE CLIENTE (POST /api/clientes/cadastrarcliente)
+    // ===========================================
+    document.getElementById('cadastroForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('nome').value;
+        const cpf = document.getElementById('cpf').value;
+
+        displayResult('cadastroResult', 'Enviando dados para cadastro...', false);
+
+        try {
+            const response = await fetch(`${CLIENTE_BASE_URL}/cadastrarcliente`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome: nome, cpf: cpf })
+            });
+
+            const data = await response.json();
+            if (response.status === 201 || response.ok) {
+                displayResult('cadastroResult', `
+✅ Cliente cadastrado com sucesso!
+ID: ${data.id}
+Nome: ${data.nome}
+CPF: ${data.cpf}
+`, false);
+            } else {
+                displayResult('cadastroResult', '❌ Erro ao cadastrar cliente: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('cadastroResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 2. CONSULTA DE MESA/CONTA (GET /api/clientes/consumo/{tokenMesa})
+    // ===========================================
+    document.getElementById('consultaMesaForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // Alterado para 'tokenMesa' para refletir o nome do campo de texto
+        const tokenMesa = document.getElementById('tokenMesa').value;
+
+        displayResult('consultaMesaResult', `Consultando conta usando o token: ${tokenMesa}...`, false);
+
+        try {
+            // Alterado o endpoint para usar o token: GET /api/clientes/consumo/{tokenMesa}
+            const response = await fetch(`${CLIENTE_BASE_URL}/consumo/${tokenMesa}`, {
+                method: 'GET'
+            });
+
+            if (response.ok) {
+                // O body esperado é o ContaDetalhesDTO
+                const conta = await response.json();
+
+                // Formata e exibe os detalhes da conta
+                const htmlContent = formatarConta(conta);
+                displayResult('consultaMesaResult', htmlContent, false);
+
+            } else {
+                const data = await response.json().catch(() => ({ message: response.statusText }));
+                displayResult('consultaMesaResult',
+                    `❌ Erro ao consultar conta:
+                    ${data.message || 'Conta não encontrada, token inválido ou erro no servidor.'}`,
+                    true);
+            }
+        } catch (error) {
+            displayResult('consultaMesaResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+</script>
+</body>
+</html>

@@ -21,14 +21,14 @@ public class ClienteController {
     }
 
     // Listar todos os clientes
-    @GetMapping
+    @GetMapping("/listar")
     public ResponseEntity<List<Cliente>> listarTodos() {
         List<Cliente> clientes = clienteService. listarTodos();
         return ResponseEntity.ok(clientes);
     }
 
     // Cadastrar novo cliente
-    @PostMapping
+    @PostMapping("/cadastrarcliente")
     public ResponseEntity<Cliente> cadastrar(@RequestBody ClienteDTO dto) {
         Cliente cliente = clienteService.cadastrar(dto. getNome(), dto.getCpf());
         return ResponseEntity.status(HttpStatus.CREATED).body(cliente);

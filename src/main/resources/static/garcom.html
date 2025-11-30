@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar System - Garçom</title>
+    <style>
+        /* Estilos usando paleta de cores para Garçom (verde/azul) */
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+        h1 { color: #28a745; text-align: center; margin-bottom: 25px; border-bottom: 3px solid #28a745; padding-bottom: 10px; }
+        h2 { color: #28a745; margin-top: 30px; margin-bottom: 15px; }
+        .section { margin-bottom: 35px; padding: 20px; border: 1px solid #c8e6c9; border-radius: 8px; background-color: #e8f5e9; }
+        fieldset { border: 1px solid #a5d6a7; padding: 15px; border-radius: 6px; margin-top: 15px; }
+        legend { font-weight: bold; color: #28a745; padding: 0 10px; }
+        label { display: block; margin-top: 10px; font-weight: 600; color: #333; }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: #28a745; outline: none; box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25); }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: bold;
+        }
+        button:hover { background-color: #1e7e34; transform: translateY(-1px); }
+
+        .result { white-space: pre-wrap; margin-top: 15px; padding: 15px; border: 1px solid #ccc; background-color: #f8f8f8; border-radius: 6px; font-size: 0.9em; max-height: 300px; overflow-y: auto; }
+        .error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+
+        .logout-btn { position: absolute; top: 20px; right: 20px; background-color: #6c757d; color: white; }
+        .logout-btn:hover { background-color: #5a6268; }
+
+        .form-row { display: flex; gap: 20px; }
+        .form-group { flex: 1; }
+    </style>
+</head>
+<body>
+
+<button class="logout-btn" onclick="window.location.href='index.html'">Voltar ao Login</button>
+
+<div class="container">
+    <h1>Área do Garçom</h1>
+
+    <!-- ============================================== -->
+    <!-- 1. ABRIR MESA -->
+    <!-- POST /api/garcom/abrir -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>1. Abrir Nova Mesa</h2>
+        <fieldset>
+            <legend>Dados Iniciais da Conta</legend>
+            <form id="abrirMesaForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numeroMesa">Número da Mesa</label>
+                        <input type="number" id="numeroMesa" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroPessoas">Número de Pessoas</label>
+                        <input type="number" id="numeroPessoas" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="garcomIdMesa">Seu ID (Garçom)</label>
+                        <input type="number" id="garcomIdMesa" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clienteIdMesa">ID do Cliente Principal (Opcional)</label>
+                        <input type="number" id="clienteIdMesa">
+                    </div>
+                </div>
+                <button type="submit">Abrir Mesa e Iniciar Conta</button>
+            </form>
+            <div id="abrirMesaResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 2. ADICIONAR ITEM -->
+    <!-- POST /api/garcom/consumo/adicionar -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>2. Adicionar Item ao Consumo</h2>
+        <fieldset>
+            <legend>Registro de Pedido</legend>
+            <form id="adicionarConsumoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contaIdAdicionar">ID da Conta</label>
+                        <input type="number" id="contaIdAdicionar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCardapioId">ID do Item no Cardápio</label>
+                        <input type="number" id="itemCardapioId" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="quantidade">Quantidade</label>
+                        <input type="number" id="quantidade" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="garcomIdAdicionar">Seu ID (Garçom)</label>
+                        <input type="number" id="garcomIdAdicionar" required>
+                    </div>
+                </div>
+                <button type="submit">Adicionar Item</button>
+            </form>
+            <div id="adicionarConsumoResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 3. CANCELAR CONSUMO -->
+    <!-- POST /api/garcom/consumo/cancelar -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>3. Cancelar Item (Estornar)</h2>
+        <fieldset>
+            <legend>Exclusão de Consumo Registrado</legend>
+            <form id="cancelarConsumoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="consumoIdCancelar">ID do Consumo a Cancelar</label>
+                        <input type="number" id="consumoIdCancelar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="garcomIdCancelar">Seu ID (Garçom)</label>
+                        <input type="number" id="garcomIdCancelar" required>
+                    </div>
+                </div>
+                <div>
+                    <label for="motivoCancelamento">Motivo do Cancelamento</label>
+                    <input type="text" id="motivoCancelamento" required>
+                </div>
+                <button type="submit" style="background-color: #dc3545;">Cancelar Consumo</button>
+            </form>
+            <div id="cancelarConsumoResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 4. REGISTRAR PAGAMENTO -->
+    <!-- POST /api/garcom/pagamento -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>4. Registrar Pagamento</h2>
+        <fieldset>
+            <legend>Registro Parcial ou Total</legend>
+            <form id="registrarPagamentoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contaIdPagamento">ID da Conta</label>
+                        <input type="number" id="contaIdPagamento" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="valorPago">Valor Pago (R$)</label>
+                        <input type="number" id="valorPago" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="garcomIdPagamento">Seu ID (Garçom)</label>
+                    <input type="number" id="garcomIdPagamento" required>
+                </div>
+                <button type="submit">Registrar Pagamento</button>
+            </form>
+            <div id="registrarPagamentoResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 5. FECHAR CONTA -->
+    <!-- PUT /api/garcom/fechar/{contaId}/{garcomId} -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>5. Fechar Conta</h2>
+        <fieldset>
+            <legend>Finalizar e Bloquear a Conta</legend>
+            <form id="fecharContaForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contaIdFechar">ID da Conta a Fechar</label>
+                        <input type="number" id="contaIdFechar" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="garcomIdFechar">Seu ID (Garçom)</label>
+                        <input type="number" id="garcomIdFechar" required>
+                    </div>
+                </div>
+                <button type="submit" style="background-color: #007bff;">Fechar Conta</button>
+            </form>
+            <div id="fecharContaResult" class="result"></div>
+        </fieldset>
+    </div>
+
+</div>
+
+<script>
+    const BASE_URL = 'http://localhost:8080/api';
+    const GARCOM_BASE_URL = BASE_URL + '/garcom';
+
+    // ===========================================
+    // UTILS
+    // ===========================================
+    function displayResult(elementId, message, isError = false) {
+        const resultDiv = document.getElementById(elementId);
+        resultDiv.textContent = message;
+        resultDiv.className = 'result ' + (isError ? 'error' : 'success');
+        resultDiv.scrollTop = resultDiv.scrollHeight;
+    }
+
+    // ===========================================
+    // 1. ABRIR MESA (POST /api/garcom/abrir)
+    // ===========================================
+    document.getElementById('abrirMesaForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const numeroMesa = parseInt(document.getElementById('numeroMesa').value);
+        const numeroPessoas = parseInt(document.getElementById('numeroPessoas').value);
+        const garcomId = parseInt(document.getElementById('garcomIdMesa').value);
+        const clienteIdInput = document.getElementById('clienteIdMesa').value;
+        const clienteId = clienteIdInput ? parseInt(clienteIdInput) : null;
+
+        displayResult('abrirMesaResult', 'Abrindo mesa e conta...', false);
+
+        try {
+            const response = await fetch(`${GARCOM_BASE_URL}/abrir`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ numeroMesa, numeroPessoas, garcomId, clienteId })
+            });
+
+            const data = await response.json();
+            if (response.status === 201 || response.ok) {
+                displayResult('abrirMesaResult', `
+✅ Mesa Aberta com Sucesso!
+Número da Mesa: ${data.numeroMesa}
+ID da Conta: ${data.contaId}
+Token de Acesso (Cliente): ${data.tokenMesa}
+`, false);
+            } else {
+                displayResult('abrirMesaResult', '❌ Erro ao abrir mesa: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('abrirMesaResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 2. ADICIONAR ITEM (POST /api/garcom/consumo/adicionar)
+    // ===========================================
+    document.getElementById('adicionarConsumoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const contaId = parseInt(document.getElementById('contaIdAdicionar').value);
+        const itemCardapioId = parseInt(document.getElementById('itemCardapioId').value);
+        const quantidade = parseInt(document.getElementById('quantidade').value);
+        const garcomId = parseInt(document.getElementById('garcomIdAdicionar').value);
+
+        displayResult('adicionarConsumoResult', 'Adicionando item ao consumo...', false);
+
+        try {
+            const response = await fetch(`${GARCOM_BASE_URL}/consumo/adicionar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contaId, itemCardapioId, quantidade, garcomId })
+            });
+
+            const data = await response.json();
+            if (response.status === 201 || response.ok) {
+                displayResult('adicionarConsumoResult', `
+✅ Consumo Adicionado (ID: ${data.id})
+Conta ID: ${data.contaId}
+Item ID: ${data.itemCardapioId}
+Quantidade: ${data.quantidade}
+Preço Unitário: R$ ${data.precoUnitario ? data.precoUnitario.toFixed(2) : 'N/A'}
+`, false);
+            } else {
+                displayResult('adicionarConsumoResult', '❌ Erro ao adicionar consumo: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('adicionarConsumoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 3. CANCELAR CONSUMO (POST /api/garcom/consumo/cancelar)
+    // ===========================================
+    document.getElementById('cancelarConsumoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const consumoId = parseInt(document.getElementById('consumoIdCancelar').value);
+        const motivo = document.getElementById('motivoCancelamento').value;
+        const garcomId = parseInt(document.getElementById('garcomIdCancelar').value);
+
+        displayResult('cancelarConsumoResult', `Cancelando consumo ID ${consumoId}...`, false);
+
+        try {
+            const response = await fetch(`${GARCOM_BASE_URL}/consumo/cancelar`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ consumoId, motivo, garcomId })
+            });
+
+            if (response.status === 204) { // No Content
+                displayResult('cancelarConsumoResult', `✅ Consumo ID ${consumoId} cancelado com sucesso.`, false);
+            } else {
+                const data = await response.json().catch(() => ({}));
+                displayResult('cancelarConsumoResult', '❌ Erro ao cancelar consumo: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('cancelarConsumoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 4. REGISTRAR PAGAMENTO (POST /api/garcom/pagamento)
+    // ===========================================
+    document.getElementById('registrarPagamentoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const contaId = parseInt(document.getElementById('contaIdPagamento').value);
+        const valorPago = parseFloat(document.getElementById('valorPago').value);
+        const garcomId = parseInt(document.getElementById('garcomIdPagamento').value);
+
+        displayResult('registrarPagamentoResult', `Registrando pagamento de R$ ${valorPago.toFixed(2)} na conta ${contaId}...`, false);
+
+        try {
+            const response = await fetch(`${GARCOM_BASE_URL}/pagamento`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contaId, valorPago, garcomId })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                displayResult('registrarPagamentoResult', `
+✅ Pagamento registrado com sucesso!
+Conta ID: ${data.id}
+Status: ${data.status}
+Saldo Devedor Restante: R$ ${data.saldoDevedor ? data.saldoDevedor.toFixed(2) : '0.00'}
+`, false);
+            } else {
+                displayResult('registrarPagamentoResult', '❌ Erro ao registrar pagamento: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('registrarPagamentoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 5. FECHAR CONTA (PUT /api/garcom/fechar/{contaId}/{garcomId})
+    // ===========================================
+    document.getElementById('fecharContaForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const contaId = parseInt(document.getElementById('contaIdFechar').value);
+        const garcomId = parseInt(document.getElementById('garcomIdFechar').value);
+
+        displayResult('fecharContaResult', `Fechando conta ID ${contaId}...`, false);
+
+        try {
+            const response = await fetch(`${GARCOM_BASE_URL}/fechar/${contaId}/${garcomId}`, {
+                method: 'PUT'
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                displayResult('fecharContaResult', `
+✅ Conta Fechada com sucesso!
+Conta ID: ${data.id}
+Status: ${data.status}
+Total Pago: R$ ${data.valorTotalPago ? data.valorTotalPago.toFixed(2) : 'N/A'}
+`, false);
+            } else {
+                displayResult('fecharContaResult', '❌ Erro ao fechar conta: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('fecharContaResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+</script>
+</body>
+</html>

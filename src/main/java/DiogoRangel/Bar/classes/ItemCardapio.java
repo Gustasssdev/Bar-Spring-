@@ -1,5 +1,6 @@
 package DiogoRangel.Bar.classes;
 
+import DiogoRangel.Bar.enums.TipoItem;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -14,11 +15,11 @@ public class ItemCardapio {
 
     private String nome;
     private double valor;
-    private int tipo;   // 2 = bebida, 3 = comida
-
+    @Enumerated(EnumType.STRING)
+    private TipoItem tipo;
     public ItemCardapio() {} // construtor JPA obrigatório
 
-    public ItemCardapio(String nome, double valor, int tipo) {
+    public ItemCardapio(String nome, double valor, TipoItem tipo) {
         this.nome = nome;
         this.valor = valor;
         this.tipo = tipo;
