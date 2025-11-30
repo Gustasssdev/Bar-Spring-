@@ -2,6 +2,7 @@ package DiogoRangel.Bar.classes;
 
 import DiogoRangel.Bar.enums.StatusConsumo;
 import DiogoRangel.Bar.exception.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Consumo {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     private Conta conta;
 
     @ManyToOne

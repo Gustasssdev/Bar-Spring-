@@ -1,0 +1,227 @@
+<! DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1. 0">
+    <title>Bar System - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        . subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        . subtitle.admin { color: #dc3545; font-weight: bold; }
+        .subtitle.garcom { color: #28a745; font-weight: bold; }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        . btn-login {
+            background-color: #007bff;
+            color: white;
+        }
+        . btn-login:hover {
+            background-color: #0056b3;
+        }
+        . btn-login.admin {
+            background-color: #dc3545;
+        }
+        .btn-login.admin:hover {
+            background-color: #c82333;
+        }
+        .btn-login. garcom {
+            background-color: #28a745;
+        }
+        .btn-login. garcom:hover {
+            background-color: #1e7e34;
+        }
+        .btn-voltar {
+            background-color: #6c757d;
+            color: white;
+            margin-top: 10px;
+        }
+        . btn-voltar:hover {
+            background-color: #5a6268;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            display: none;
+        }
+        .info-box {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔐 Login</h1>
+    <p class="subtitle" id="tipoUsuario"></p>
+
+    <!-- Informações de acesso (SEM MOSTRAR SENHA) -->
+    <div class="info-box" id="infoBox"></div>
+
+    <form id="loginForm">
+        <div>
+            <label for="id">ID do Usuário</label>
+            <input type="number" id="id" required placeholder="Digite seu ID" autofocus>
+        </div>
+        <div>
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" required placeholder="Digite sua senha">
+        </div>
+        <button type="submit" class="btn-login" id="btnLogin">Entrar</button>
+        <button type="button" class="btn-voltar" onclick="window.location.href='/index.html'">Voltar</button>
+    </form>
+
+    <div class="error" id="errorMessage"></div>
+</div>
+
+<script>
+    const BASE_URL = 'http://localhost:8080/api';
+
+    // Obter tipo de usuário da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipoUsuario = urlParams. get('tipo'); // ADMINISTRADOR ou GARCOM
+
+    console.log('Tipo de usuário:', tipoUsuario); // Debug
+
+    // Configurar interface baseado no tipo
+    const tipoElement = document.getElementById('tipoUsuario');
+    const btnLogin = document.getElementById('btnLogin');
+    const infoBox = document.getElementById('infoBox');
+
+    if (tipoUsuario === 'ADMINISTRADOR') {
+        tipoElement.textContent = 'Administrador';
+        tipoElement.className = 'subtitle admin';
+        btnLogin. classList.add('admin');
+        infoBox.innerHTML = '📌 <strong>Acesso Administrativo</strong><br>Entre com suas credenciais para continuar';
+    } else if (tipoUsuario === 'GARCOM') {
+        tipoElement. textContent = 'Garçom';
+        tipoElement. className = 'subtitle garcom';
+        btnLogin.classList.add('garcom');
+        infoBox.innerHTML = '📌 <strong>Acesso de Garçom</strong><br>Entre com suas credenciais para continuar';
+    } else {
+        // Tipo inválido, redireciona
+        console.error('Tipo de usuário inválido:', tipoUsuario);
+        window.location.href = '/index.html';
+    }
+
+    // Função de login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e. preventDefault();
+
+        const id = parseInt(document.getElementById('id').value);
+        const senha = document. getElementById('senha').value;
+        const errorDiv = document.getElementById('errorMessage');
+
+        errorDiv.style.display = 'none';
+
+        console.log('Tentando login:', { id, tipoUsuario }); // Debug
+
+        try {
+            const response = await fetch(`${BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, senha })
+            });
+
+            console.log('Response status:', response. status); // Debug
+
+            if (!response. ok) {
+                // Erro HTTP
+                const errorData = await response.json();
+                console.error('Erro do servidor:', errorData); // Debug
+                errorDiv.textContent = `❌ ${errorData.message || 'Erro ao fazer login'}`;
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const data = await response. json();
+            console.log('Login bem-sucedido:', data); // Debug
+
+            // Verificar se o perfil do usuário bate com o esperado
+            if (data.perfil !== tipoUsuario) {
+                console.error('Perfil incompatível:', data.perfil, 'vs', tipoUsuario); // Debug
+                errorDiv.textContent = `❌ Este usuário não tem permissão para acessar esta área`;
+                errorDiv.style. display = 'block';
+                return;
+            }
+
+            // Login bem-sucedido!  Redirecionar
+            console.log('Redirecionando para:', tipoUsuario); // Debug
+
+            if (tipoUsuario === 'ADMINISTRADOR') {
+                window.location.href = '/admin.html';
+            } else if (tipoUsuario === 'GARCOM') {
+                window. location.href = '/garcom.html';
+            }
+
+        } catch (error) {
+            console.error('Erro de comunicação:', error); // Debug
+            errorDiv.textContent = `❌ Erro de comunicação com o servidor: ${error.message}`;
+            errorDiv.style.display = 'block';
+        }
+    });
+</script>
+</body>
+</html>

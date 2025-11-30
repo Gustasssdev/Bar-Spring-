@@ -1,6 +1,7 @@
 package DiogoRangel.Bar.model;
 
 import DiogoRangel.Bar.classes.Conta;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class Mesa {
     private String token;
 
     @OneToMany(mappedBy = "mesa", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Conta> contas = new ArrayList<>();
 
     private double couvert = 0;

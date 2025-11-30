@@ -4,6 +4,8 @@ import DiogoRangel.Bar.enums.TipoItem;
 import DiogoRangel.Bar.model.Cliente;
 import DiogoRangel.Bar.classes.ItemCardapio;
 import DiogoRangel.Bar.model.Mesa;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,12 +30,14 @@ public class Conta {
     private boolean estaAberta = true;
 
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Consumo> consumos = new ArrayList<>();
 
     @ElementCollection
     private List<Double> pagamentos = new ArrayList<>();
 
     @ManyToOne
+    @JsonBackReference
     private Mesa mesa; // Assumimos que Mesa tem o numPessoas
 
     @Column(name = "data_abertura", nullable = false)

@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bar System - Garçom</title>
     <style>
-        /* Estilos usando paleta de cores para Garçom (verde/azul) */
-        body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; padding: 20px; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f8f8; padding: 20px; }
         .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
         h1 { color: #28a745; text-align: center; margin-bottom: 25px; border-bottom: 3px solid #28a745; padding-bottom: 10px; }
         h2 { color: #28a745; margin-top: 30px; margin-bottom: 15px; }
-        .section { margin-bottom: 35px; padding: 20px; border: 1px solid #c8e6c9; border-radius: 8px; background-color: #e8f5e9; }
-        fieldset { border: 1px solid #a5d6a7; padding: 15px; border-radius: 6px; margin-top: 15px; }
+        .section { margin-bottom: 35px; padding: 20px; border: 1px solid #c3e6cb; border-radius: 8px; background-color: #d4edda; }
+        fieldset { border: 1px solid #28a745; padding: 15px; border-radius: 6px; margin-top: 15px; }
         legend { font-weight: bold; color: #28a745; padding: 0 10px; }
         label { display: block; margin-top: 10px; font-weight: 600; color: #333; }
         input[type="number"], input[type="text"] {
@@ -51,15 +50,11 @@
 </head>
 <body>
 
-<button class="logout-btn" onclick="window.location.href='index.html'">Voltar ao Login</button>
-
+<button class="logout-btn" onclick="window.location.href='/index.html'">Voltar ao Login</button>v
 <div class="container">
     <h1>Área do Garçom</h1>
 
-    <!-- ============================================== -->
-    <!-- 1. ABRIR MESA -->
-    <!-- POST /api/garcom/abrir -->
-    <!-- ============================================== -->
+    <!-- 1.  ABRIR MESA -->
     <div class="section">
         <h2>1. Abrir Nova Mesa</h2>
         <fieldset>
@@ -91,79 +86,70 @@
         </fieldset>
     </div>
 
-    <!-- ============================================== -->
-    <!-- 2. ADICIONAR ITEM -->
-    <!-- POST /api/garcom/consumo/adicionar -->
-    <!-- ============================================== -->
+    <!-- 2.  ADICIONAR ITEM -->
     <div class="section">
-        <h2>2. Adicionar Item ao Consumo</h2>
+        <h2>2. Adicionar Item à Conta</h2>
         <fieldset>
-            <legend>Registro de Pedido</legend>
-            <form id="adicionarConsumoForm">
+            <legend>Registrar Consumo</legend>
+            <form id="adicionarItemForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="contaIdAdicionar">ID da Conta</label>
-                        <input type="number" id="contaIdAdicionar" required>
+                        <label for="contaId">ID da Conta</label>
+                        <input type="number" id="contaId" required>
                     </div>
                     <div class="form-group">
-                        <label for="itemCardapioId">ID do Item no Cardápio</label>
+                        <label for="itemCardapioId">ID do Item (Cardápio)</label>
                         <input type="number" id="itemCardapioId" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="quantidade">Quantidade</label>
-                        <input type="number" id="quantidade" min="1" value="1" required>
+                        <input type="number" id="quantidade" required>
                     </div>
                     <div class="form-group">
-                        <label for="garcomIdAdicionar">Seu ID (Garçom)</label>
-                        <input type="number" id="garcomIdAdicionar" required>
+                        <label for="garcomIdItem">Seu ID (Garçom)</label>
+                        <input type="number" id="garcomIdItem" required>
                     </div>
                 </div>
                 <button type="submit">Adicionar Item</button>
             </form>
-            <div id="adicionarConsumoResult" class="result"></div>
+            <div id="adicionarItemResult" class="result"></div>
         </fieldset>
     </div>
 
-    <!-- ============================================== -->
     <!-- 3. CANCELAR CONSUMO -->
-    <!-- POST /api/garcom/consumo/cancelar -->
-    <!-- ============================================== -->
     <div class="section">
-        <h2>3. Cancelar Item (Estornar)</h2>
+        <h2>3. Cancelar Consumo</h2>
         <fieldset>
-            <legend>Exclusão de Consumo Registrado</legend>
+            <legend>Cancelar Item Pedido</legend>
             <form id="cancelarConsumoForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="consumoIdCancelar">ID do Consumo a Cancelar</label>
-                        <input type="number" id="consumoIdCancelar" required>
+                        <label for="consumoId">ID do Consumo</label>
+                        <input type="number" id="consumoId" required>
                     </div>
                     <div class="form-group">
                         <label for="garcomIdCancelar">Seu ID (Garçom)</label>
                         <input type="number" id="garcomIdCancelar" required>
                     </div>
                 </div>
-                <div>
+                <div class="form-group">
                     <label for="motivoCancelamento">Motivo do Cancelamento</label>
                     <input type="text" id="motivoCancelamento" required>
                 </div>
-                <button type="submit" style="background-color: #dc3545;">Cancelar Consumo</button>
+                <button type="submit">Cancelar Consumo</button>
             </form>
             <div id="cancelarConsumoResult" class="result"></div>
         </fieldset>
     </div>
 
-    <!-- ============================================== -->
-    <!-- 4. REGISTRAR PAGAMENTO -->
-    <!-- POST /api/garcom/pagamento -->
-    <!-- ============================================== -->
+    <!-- 4.  REGISTRAR PAGAMENTO -->
     <div class="section">
         <h2>4. Registrar Pagamento</h2>
         <fieldset>
-            <legend>Registro Parcial ou Total</legend>
-            <form id="registrarPagamentoForm">
+            <legend>Receber Pagamento do Cliente</legend>
+            <form id="pagamentoForm">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="contaIdPagamento">ID da Conta</label>
@@ -173,29 +159,26 @@
                         <label for="valorPago">Valor Pago (R$)</label>
                         <input type="number" id="valorPago" step="0.01" required>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="garcomIdPagamento">Seu ID (Garçom)</label>
-                    <input type="number" id="garcomIdPagamento" required>
+                    <div class="form-group">
+                        <label for="garcomIdPagamento">Seu ID (Garçom)</label>
+                        <input type="number" id="garcomIdPagamento" required>
+                    </div>
                 </div>
                 <button type="submit">Registrar Pagamento</button>
             </form>
-            <div id="registrarPagamentoResult" class="result"></div>
+            <div id="pagamentoResult" class="result"></div>
         </fieldset>
     </div>
 
-    <!-- ============================================== -->
     <!-- 5. FECHAR CONTA -->
-    <!-- PUT /api/garcom/fechar/{contaId}/{garcomId} -->
-    <!-- ============================================== -->
     <div class="section">
         <h2>5. Fechar Conta</h2>
         <fieldset>
-            <legend>Finalizar e Bloquear a Conta</legend>
+            <legend>Finalizar Conta da Mesa</legend>
             <form id="fecharContaForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="contaIdFechar">ID da Conta a Fechar</label>
+                        <label for="contaIdFechar">ID da Conta</label>
                         <input type="number" id="contaIdFechar" required>
                     </div>
                     <div class="form-group">
@@ -203,7 +186,7 @@
                         <input type="number" id="garcomIdFechar" required>
                     </div>
                 </div>
-                <button type="submit" style="background-color: #007bff;">Fechar Conta</button>
+                <button type="submit">Fechar Conta</button>
             </form>
             <div id="fecharContaResult" class="result"></div>
         </fieldset>
@@ -215,28 +198,23 @@
     const BASE_URL = 'http://localhost:8080/api';
     const GARCOM_BASE_URL = BASE_URL + '/garcom';
 
-    // ===========================================
-    // UTILS
-    // ===========================================
     function displayResult(elementId, message, isError = false) {
         const resultDiv = document.getElementById(elementId);
         resultDiv.textContent = message;
         resultDiv.className = 'result ' + (isError ? 'error' : 'success');
-        resultDiv.scrollTop = resultDiv.scrollHeight;
+        resultDiv. scrollTop = resultDiv.scrollHeight;
     }
 
-    // ===========================================
-    // 1. ABRIR MESA (POST /api/garcom/abrir)
-    // ===========================================
+    // 1. ABRIR MESA
     document.getElementById('abrirMesaForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const numeroMesa = parseInt(document.getElementById('numeroMesa').value);
         const numeroPessoas = parseInt(document.getElementById('numeroPessoas').value);
         const garcomId = parseInt(document.getElementById('garcomIdMesa').value);
-        const clienteIdInput = document.getElementById('clienteIdMesa').value;
+        const clienteIdInput = document.getElementById('clienteIdMesa'). value;
         const clienteId = clienteIdInput ? parseInt(clienteIdInput) : null;
 
-        displayResult('abrirMesaResult', 'Abrindo mesa e conta...', false);
+        displayResult('abrirMesaResult', 'Abrindo mesa...', false);
 
         try {
             const response = await fetch(`${GARCOM_BASE_URL}/abrir`, {
@@ -246,32 +224,31 @@
             });
 
             const data = await response.json();
-            if (response.status === 201 || response.ok) {
+            if (response.status === 201) {
                 displayResult('abrirMesaResult', `
 ✅ Mesa Aberta com Sucesso!
-Número da Mesa: ${data.numeroMesa}
-ID da Conta: ${data.contaId}
-Token de Acesso (Cliente): ${data.tokenMesa}
-`, false);
+ID da Mesa: ${data.id}
+Número: ${data.numero}
+Token: ${data.token}
+Conta Ativa: ${data.contaAtiva ?  'Sim' : 'Não'}
+                `, false);
             } else {
-                displayResult('abrirMesaResult', '❌ Erro ao abrir mesa: ' + (data.message || response.statusText), true);
+                displayResult('abrirMesaResult', '❌ Erro: ' + (data.message || response.statusText), true);
             }
         } catch (error) {
-            displayResult('abrirMesaResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+            displayResult('abrirMesaResult', '❌ Erro de comunicação: ' + error.message, true);
         }
     });
 
-    // ===========================================
-    // 2. ADICIONAR ITEM (POST /api/garcom/consumo/adicionar)
-    // ===========================================
-    document.getElementById('adicionarConsumoForm').addEventListener('submit', async (e) => {
+    // 2. ADICIONAR ITEM
+    document.getElementById('adicionarItemForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const contaId = parseInt(document.getElementById('contaIdAdicionar').value);
+        const contaId = parseInt(document. getElementById('contaId').value);
         const itemCardapioId = parseInt(document.getElementById('itemCardapioId').value);
-        const quantidade = parseInt(document.getElementById('quantidade').value);
-        const garcomId = parseInt(document.getElementById('garcomIdAdicionar').value);
+        const quantidade = parseInt(document. getElementById('quantidade').value);
+        const garcomId = parseInt(document.getElementById('garcomIdItem'). value);
 
-        displayResult('adicionarConsumoResult', 'Adicionando item ao consumo...', false);
+        displayResult('adicionarItemResult', 'Adicionando item...', false);
 
         try {
             const response = await fetch(`${GARCOM_BASE_URL}/consumo/adicionar`, {
@@ -281,61 +258,58 @@ Token de Acesso (Cliente): ${data.tokenMesa}
             });
 
             const data = await response.json();
-            if (response.status === 201 || response.ok) {
-                displayResult('adicionarConsumoResult', `
-✅ Consumo Adicionado (ID: ${data.id})
-Conta ID: ${data.contaId}
-Item ID: ${data.itemCardapioId}
+            if (response.status === 201) {
+                displayResult('adicionarItemResult', `
+✅ Item Adicionado com Sucesso!
+ID do Consumo: ${data.id}
 Quantidade: ${data.quantidade}
-Preço Unitário: R$ ${data.precoUnitario ? data.precoUnitario.toFixed(2) : 'N/A'}
-`, false);
+                `, false);
             } else {
-                displayResult('adicionarConsumoResult', '❌ Erro ao adicionar consumo: ' + (data.message || response.statusText), true);
+                displayResult('adicionarItemResult', '❌ Erro: ' + (data. message || response.statusText), true);
             }
         } catch (error) {
-            displayResult('adicionarConsumoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+            displayResult('adicionarItemResult', '❌ Erro de comunicação: ' + error.message, true);
         }
     });
 
-    // ===========================================
-    // 3. CANCELAR CONSUMO (POST /api/garcom/consumo/cancelar)
-    // ===========================================
-    document.getElementById('cancelarConsumoForm').addEventListener('submit', async (e) => {
+    // 3. CANCELAR CONSUMO
+    document.getElementById('cancelarConsumoForm'). addEventListener('submit', async (e) => {
         e.preventDefault();
-        const consumoId = parseInt(document.getElementById('consumoIdCancelar').value);
+        const consumoId = parseInt(document.getElementById('consumoId').value);
         const motivo = document.getElementById('motivoCancelamento').value;
         const garcomId = parseInt(document.getElementById('garcomIdCancelar').value);
 
-        displayResult('cancelarConsumoResult', `Cancelando consumo ID ${consumoId}...`, false);
+        displayResult('cancelarConsumoResult', 'Cancelando consumo...', false);
 
         try {
             const response = await fetch(`${GARCOM_BASE_URL}/consumo/cancelar`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ consumoId, motivo, garcomId })
+                body: JSON. stringify({ consumoId, motivo, garcomId })
             });
 
-            if (response.status === 204) { // No Content
-                displayResult('cancelarConsumoResult', `✅ Consumo ID ${consumoId} cancelado com sucesso.`, false);
+            if (response.status === 204) {
+                displayResult('cancelarConsumoResult', `
+✅ Consumo Cancelado com Sucesso!
+Motivo: ${motivo}
+                `, false);
             } else {
-                const data = await response.json().catch(() => ({}));
-                displayResult('cancelarConsumoResult', '❌ Erro ao cancelar consumo: ' + (data.message || response.statusText), true);
+                const data = await response.json();
+                displayResult('cancelarConsumoResult', '❌ Erro: ' + (data.message || response.statusText), true);
             }
         } catch (error) {
-            displayResult('cancelarConsumoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+            displayResult('cancelarConsumoResult', '❌ Erro de comunicação: ' + error.message, true);
         }
     });
 
-    // ===========================================
-    // 4. REGISTRAR PAGAMENTO (POST /api/garcom/pagamento)
-    // ===========================================
-    document.getElementById('registrarPagamentoForm').addEventListener('submit', async (e) => {
+    // 4. REGISTRAR PAGAMENTO
+    document.getElementById('pagamentoForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const contaId = parseInt(document.getElementById('contaIdPagamento').value);
-        const valorPago = parseFloat(document.getElementById('valorPago').value);
+        const valorPago = parseFloat(document. getElementById('valorPago').value);
         const garcomId = parseInt(document.getElementById('garcomIdPagamento').value);
 
-        displayResult('registrarPagamentoResult', `Registrando pagamento de R$ ${valorPago.toFixed(2)} na conta ${contaId}...`, false);
+        displayResult('pagamentoResult', 'Registrando pagamento...', false);
 
         try {
             const response = await fetch(`${GARCOM_BASE_URL}/pagamento`, {
@@ -346,29 +320,26 @@ Preço Unitário: R$ ${data.precoUnitario ? data.precoUnitario.toFixed(2) : 'N/A
 
             const data = await response.json();
             if (response.ok) {
-                displayResult('registrarPagamentoResult', `
-✅ Pagamento registrado com sucesso!
-Conta ID: ${data.id}
-Status: ${data.status}
-Saldo Devedor Restante: R$ ${data.saldoDevedor ? data.saldoDevedor.toFixed(2) : '0.00'}
-`, false);
+                displayResult('pagamentoResult', `
+✅ Pagamento Registrado com Sucesso!
+Total Pago: R$ ${data.totalPago.toFixed(2)}
+Está Aberta: ${data.estaAberta ? 'Sim' : 'Não'}
+                `, false);
             } else {
-                displayResult('registrarPagamentoResult', '❌ Erro ao registrar pagamento: ' + (data.message || response.statusText), true);
+                displayResult('pagamentoResult', '❌ Erro: ' + (data. message || response.statusText), true);
             }
         } catch (error) {
-            displayResult('registrarPagamentoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+            displayResult('pagamentoResult', '❌ Erro de comunicação: ' + error.message, true);
         }
     });
 
-    // ===========================================
-    // 5. FECHAR CONTA (PUT /api/garcom/fechar/{contaId}/{garcomId})
-    // ===========================================
+    // 5. FECHAR CONTA
     document.getElementById('fecharContaForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const contaId = parseInt(document.getElementById('contaIdFechar').value);
+        const contaId = parseInt(document. getElementById('contaIdFechar'). value);
         const garcomId = parseInt(document.getElementById('garcomIdFechar').value);
 
-        displayResult('fecharContaResult', `Fechando conta ID ${contaId}...`, false);
+        displayResult('fecharContaResult', 'Fechando conta...', false);
 
         try {
             const response = await fetch(`${GARCOM_BASE_URL}/fechar/${contaId}/${garcomId}`, {
@@ -378,19 +349,17 @@ Saldo Devedor Restante: R$ ${data.saldoDevedor ? data.saldoDevedor.toFixed(2) : 
             const data = await response.json();
             if (response.ok) {
                 displayResult('fecharContaResult', `
-✅ Conta Fechada com sucesso!
-Conta ID: ${data.id}
-Status: ${data.status}
-Total Pago: R$ ${data.valorTotalPago ? data.valorTotalPago.toFixed(2) : 'N/A'}
-`, false);
+✅ Conta Fechada com Sucesso!
+ID da Conta: ${data.id}
+Está Aberta: ${data.estaAberta ? 'Sim' : 'Não'}
+                `, false);
             } else {
-                displayResult('fecharContaResult', '❌ Erro ao fechar conta: ' + (data.message || response.statusText), true);
+                displayResult('fecharContaResult', '❌ Erro: ' + (data.message || response.statusText), true);
             }
         } catch (error) {
-            displayResult('fecharContaResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+            displayResult('fecharContaResult', '❌ Erro de comunicação: ' + error.message, true);
         }
     });
-
 </script>
 </body>
 </html>

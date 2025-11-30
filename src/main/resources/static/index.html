@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<! DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1. 0">
     <title>Bar System - Acesso</title>
     <style>
         body {
@@ -39,10 +39,10 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            text-decoration: none; /* Para usar como link */
-            line-height: 1.5; /* Centraliza o texto */
+            text-decoration: none;
+            line-height: 1.5;
         }
-        .profile-button.admin { background-color: #dc3545; }
+        .profile-button. admin { background-color: #dc3545; }
         .profile-button.garcom { background-color: #28a745; }
         .profile-button.cliente { background-color: #ffc107; color: #333;}
 
@@ -56,10 +56,16 @@
     <h1>👋 Bem-vindo ao Bar System</h1>
     <p>Selecione seu perfil para acessar:</p>
 
-    <a href="admin.html" class="profile-button admin"> Administrador </a>
-    <a href="garcom.html" class="profile-button garcom"> Garçom </a>
-    <a href="cliente.html" class="profile-button cliente"> Cliente </a>
-
+    <button class="profile-button admin" onclick="irParaLogin('ADMINISTRADOR')">🔴 Administrador</button>
+    <button class="profile-button garcom" onclick="irParaLogin('GARCOM')">🟢 Garçom</button>
+    <button class="profile-button cliente" onclick="window.location.href='/cliente.html'">🟡 Cliente</button>
 </div>
+
+<script>
+    function irParaLogin(tipo) {
+        // ✅ Caminho absoluto com barra no início
+        window.location.href = `/login.html?tipo=${tipo}`;
+    }
+</script>
 </body>
 </html>
