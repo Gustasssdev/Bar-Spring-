@@ -17,8 +17,6 @@ public class ConsumoDetalheDTO {
      public ConsumoDetalheDTO(Consumo consumo) {
          this.nomeItem = consumo.getItem().getNome();
 
-         // CORREÇÃO 1: O método getTipo() da entidade ItemCardapio retorna um Enum TipoItem.
-         // Chamamos .toString() para garantir que seja uma String (e evitar problemas de serialização)
          this.tipo = consumo.getItem().getTipo().toString();
 
          this.quantidade = consumo.getQuantidade();

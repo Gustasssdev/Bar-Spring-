@@ -167,6 +167,36 @@
         </fieldset>
     </div>
 
+    <div class="section report-section">
+        <h2>5. Itens Mais Vendidos</h2>
+        <fieldset>
+            <legend>Ranking de Vendas</legend>
+            <form id="itensVendidosForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <button type="submit">Gerar Ranking</button>
+                    </div>
+                </div>
+            </form>
+            <div id="itensVendidosResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <div class="section report-section">
+        <h2>6. Itens com Maior Faturamento</h2>
+        <fieldset>
+            <legend>Ranking por Faturamento</legend>
+            <form id="itensFaturamentoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <button type="submit">Gerar Ranking</button>
+                    </div>
+                </div>
+            </form>
+            <div id="itensFaturamentoResult" class="result"></div>
+        </fieldset>
+    </div>
+
 </div>
 
 <script>
@@ -331,6 +361,89 @@ Faturamento Total: R$ ${parseFloat(faturamento).toFixed(2)}
             displayResult('faturamentoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
         }
     });
+
+    // ===========================================
+// 5. RELATÓRIO - ITENS MAIS VENDIDOS (GET /api/admin/relatorio/itens-mais-vendidos)
+// ===========================================
+document.getElementById('itensVendidosForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    displayResult('itensVendidosResult', 'Gerando ranking de vendas...', false);
+
+    try {
+        const response = await fetch(`${ADMIN_BASE_URL}/relatorio/itens-mais-vendidos`, {
+            method: 'GET'
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+
+            // Montar tabela visual
+            let tabela = '=== ITENS MAIS VENDIDOS ===\n\n';
+
+            if (data.length === 0) {
+                tabela += 'Nenhuma venda registrada.';
+            } else {
+                data.forEach((item, index) => {
+                    tabela += `${index + 1}º lugar\n` +
+                              `Item: ${item.nome}\n` +
+                              `Quantidade Vendida: ${item.quantidadeVendida}\n` +
+                              `------------------------------------------\n`;
+                });
+            }
+
+            displayResult('itensVendidosResult', tabela, false);
+
+        } else {
+            displayResult('itensVendidosResult', '❌ Erro ao gerar relatório: ' + (data.message || response.statusText), true);
+        }
+    } catch (error) {
+        displayResult('itensVendidosResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+    }
+});
+
+// ===========================================
+// 6. RELATÓRIO - ITENS COM MAIOR FATURAMENTO
+// GET /api/admin/relatorio/itens-maior-faturamento
+// ===========================================
+document.getElementById('itensFaturamentoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    displayResult('itensFaturamentoResult', 'Gerando ranking de faturamento...', false);
+
+    try {
+        const response = await fetch(`${ADMIN_BASE_URL}/relatorio/itens-maior-faturamento`, {
+            method: 'GET'
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+
+            let tabela = '=== ITENS COM MAIOR FATURAMENTO ===\n\n';
+
+            if (data.length === 0) {
+                tabela += 'Nenhum faturamento registrado.';
+            } else {
+                data.forEach((item, index) => {
+                    tabela += `${index + 1}º lugar\n` +
+                              `Item: ${item.nome}\n` +
+                              `Faturamento: R$ ${item.valorFaturado.toFixed(2)}\n` +
+                              `------------------------------------------\n`;
+                });
+            }
+
+            displayResult('itensFaturamentoResult', tabela, false);
+
+        } else {
+            displayResult('itensFaturamentoResult', '❌ Erro ao gerar relatório: ' + (data.message || response.statusText), true);
+        }
+    } catch (error) {
+        displayResult('itensFaturamentoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+    }
+});
+
 </script>
 </body>
 </html>

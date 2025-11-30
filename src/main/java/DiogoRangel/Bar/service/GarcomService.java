@@ -1,3 +1,4 @@
+
 package DiogoRangel.Bar.service;
 
 import DiogoRangel.Bar.model.*;
@@ -18,18 +19,20 @@ public class GarcomService {
     private final ClienteRepository clienteRepository;
     private final ItemCardapioRepository itemCardapioRepository;
     private final ConsumoRepository consumoRepository;
+    private final ConfiguracaoRepository configRepository;
 
     // 1. ADICIONADO: Injeção do ContaService
     private final ContaService contaService;
 
     // Injeção de dependências no construtor (Atualizado)
-    public GarcomService(MesaRepository mesaRepository, ContaRepository contaRepository, ClienteRepository clienteRepository, ItemCardapioRepository itemCardapioRepository, ConsumoRepository consumoRepository, ContaService contaService)
+    public GarcomService(MesaRepository mesaRepository, ContaRepository contaRepository, ClienteRepository clienteRepository, ItemCardapioRepository itemCardapioRepository, ConsumoRepository consumoRepository, ConfiguracaoRepository configRepository, ContaService contaService)
     {
         this.mesaRepository = mesaRepository;
         this.contaRepository = contaRepository;
         this.clienteRepository = clienteRepository;
         this.itemCardapioRepository = itemCardapioRepository;
         this.consumoRepository = consumoRepository;
+        this.configRepository = configRepository;
         this.contaService = contaService; // Injeção
     }
 

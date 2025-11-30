@@ -1,6 +1,8 @@
 package DiogoRangel.Bar.service;
 
+import DiogoRangel.Bar.dto.ItemFaturamentoDTO;
 import DiogoRangel.Bar.dto.ItemVendaDTO;
+import DiogoRangel.Bar.exception.DadosInvalidos;
 import DiogoRangel.Bar.model.Configuracao;
 import DiogoRangel.Bar.model.Mesa;
 import DiogoRangel.Bar.classes.ItemCardapio;
@@ -30,10 +32,12 @@ public class AdministradorService {
         this.consumoRepository = consumoRepository;
     }
 
-    public Configuracao atualizarRegras(double couvert, double percBebida, double percComida) {
+    public Configuracao atualizarRegras(double couvert, double percBebida, double percComida) throws DadosInvalidos {
         // Usa o ID fixo 1L, buscando a configuração única
         Configuracao config = configRepository.findById(1L).orElse(new Configuracao());
 
+        if(couvert < 0 || percBebida < 0 || percComida < 0)
+            throw new DadosInvalidos("Não é permitido valores negativos!");
         config.setPrecoCouvertPorPessoa(couvert);
         config.setPercentualGorjetaBebida(percBebida);
         config.setPercentualGorjetaComida(percComida);
@@ -44,7 +48,9 @@ public class AdministradorService {
     public Mesa cadastrarMesa(Mesa novaMesa) {
         return mesaRepository.save(novaMesa);
     }
-    public ItemCardapio cadastrarItem(ItemCardapio novoItem) {
+    public ItemCardapio cadastrarItem(ItemCardapio novoItem) throws DadosInvalidos{
+        if(novoItem.getValor() <= 0)
+            throw new DadosInvalidos("Não é permitido valor negativo ou zerado!");
         return itemCardapioRepository.save(novoItem);
     }
 
@@ -60,9 +66,9 @@ public class AdministradorService {
         return consumoRepository.findItensMaisVendidos();
     }
 
-    // 3. Itens com Maior Faturamento (pelo valor total de venda)
-    public List<ItemVendaDTO> gerarRelatorioItensMaiorFaturamento() {
-        return consumoRepository.findItensMaiorFaturamento();
+    public List<ItemFaturamentoDTO> gerarRelatorioItensMaiorFaturamento() {
+        return consumoRepository.findItensComMaiorFaturamento();
     }
+
 
 }

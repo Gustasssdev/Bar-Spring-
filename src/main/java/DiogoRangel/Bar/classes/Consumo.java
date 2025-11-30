@@ -1,7 +1,7 @@
 package DiogoRangel.Bar.classes;
 
 import DiogoRangel.Bar.enums.StatusConsumo;
-import DiogoRangel.Bar.exception.*;
+import DiogoRangel.Bar.exception.DadosInvalidos;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,7 +11,6 @@ import lombok.Setter;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-
 public class Consumo {
 
     @Id
@@ -27,39 +26,37 @@ public class Consumo {
 
     private int quantidade;
 
+    private double valorTotal;
+
     @Enumerated(EnumType.STRING)
     private StatusConsumo status = StatusConsumo.PEDIDO;
 
-    // Requisito: "com motivo"
     private String motivoCancelamento;
-
-    public void cancelar(String motivo) {
-        if (motivo == null || motivo.trim().isEmpty()) {
-            throw new DadosInvalidos("O motivo do cancelamento é obrigatório.");
-        }
-        if (this.status == StatusConsumo.CANCELADO) {
-            throw new IllegalStateException("Este consumo já está cancelado.");
-        }
-
-        this.status = StatusConsumo.CANCELADO;
-        this.motivoCancelamento = motivo;
-    }
 
     public Consumo(ItemCardapio item, int quantidade, Conta conta) {
         this.item = item;
         this.quantidade = quantidade;
         this.conta = conta;
+
+        this.valorTotal = item.getValor() * quantidade;
         this.status = StatusConsumo.PEDIDO;
     }
 
-    public double getValorTotal() {
-        if (this.status == StatusConsumo.CANCELADO) {
-            return 0.0;
+    public void cancelar(String motivo) {
+        if (motivo == null || motivo.trim().isEmpty()) {
+            throw new DadosInvalidos("O motivo do cancelamento é obrigatório.");
         }
-        return item.getValor() * quantidade;
+
+        if (this.status == StatusConsumo.CANCELADO) {
+            throw new IllegalStateException("Este consumo já está cancelado.");
+        }
+
+        this.status = StatusConsumo.CANCELADO;
+        this.valorTotal = 0.0;
+        this.motivoCancelamento = motivo;
     }
 
-    public boolean isCancelado(){
+    public boolean isCancelado() {
         return this.status == StatusConsumo.CANCELADO;
     }
 }

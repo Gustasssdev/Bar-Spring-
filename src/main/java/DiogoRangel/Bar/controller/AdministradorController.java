@@ -1,6 +1,7 @@
 package DiogoRangel.Bar.controller;
 
 import DiogoRangel.Bar.dto.ConfiguracaoRequestDTO;
+import DiogoRangel.Bar.dto.ItemFaturamentoDTO;
 import DiogoRangel.Bar.dto.MesaRequestDTO;
 import DiogoRangel.Bar.dto.ItemCardapioRequestDTO;
 import DiogoRangel.Bar.model.Configuracao;
@@ -14,9 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin") // Endpoint base para o Administrador
+@RequestMapping("/api/admin")
 public class AdministradorController {
 
     private final AdministradorService administradorService;
@@ -24,10 +26,6 @@ public class AdministradorController {
     public AdministradorController(AdministradorService administradorService) {
         this.administradorService = administradorService;
     }
-
-
-     //PUT /api/admin/configuracao
-      //Atualiza as regras de negócio (couvert, gorjetas).
 
     @PutMapping("/configuracao")
     public ResponseEntity<Configuracao> atualizarConfiguracao(@RequestBody @Valid ConfiguracaoRequestDTO dto) {
@@ -39,9 +37,6 @@ public class AdministradorController {
         return ResponseEntity.ok(config);
     }
 
-     //POST /api/admin/mesas
-     //Cadastrar  nova mesa.
-
     @PostMapping("/mesas")
     public ResponseEntity<Mesa> cadastrarMesa(@RequestBody @Valid MesaRequestDTO dto) {
         // Cria um objeto Mesa a partir do DTO de Request
@@ -51,14 +46,10 @@ public class AdministradorController {
         Mesa mesaSalva = administradorService.cadastrarMesa(novaMesa);
         return new ResponseEntity<>(mesaSalva, HttpStatus.CREATED);
     }
-      //POST /api/admin/cardapio
-      //Cadastra um novo item no cardápio.
 
     @PostMapping("/item")
     public ResponseEntity<ItemCardapio> cadastrarItem(@RequestBody @Valid ItemCardapioRequestDTO dto) {
-        // Cria um objeto ItemCardapio
-        ItemCardapio novoItem = new ItemCardapio(dto.getNome(),dto.getPreco(), dto.getTipo());
-
+        ItemCardapio novoItem = new ItemCardapio(dto.getNome(), dto.getPreco(), dto.getTipo());
         ItemCardapio itemSalvo = administradorService.cadastrarItem(novoItem);
         return new ResponseEntity<>(itemSalvo, HttpStatus.CREATED);
     }
@@ -72,4 +63,15 @@ public class AdministradorController {
         return ResponseEntity.ok(faturamento);
     }
 
+    //Itens Mais Vendidos
+    @GetMapping("/relatorio/itens-mais-vendidos")
+    public ResponseEntity<?> gerarRelatorioItensMaisVendidos() {
+        return ResponseEntity.ok(administradorService.gerarRelatorioItensMaisVendidos());
+    }
+
+    @GetMapping("/relatorio/itens-maior-faturamento")
+    public ResponseEntity<List<ItemFaturamentoDTO>> relatorioItensMaiorFaturamento() {
+        return ResponseEntity.ok(administradorService.gerarRelatorioItensMaiorFaturamento());
+
+    }
 }

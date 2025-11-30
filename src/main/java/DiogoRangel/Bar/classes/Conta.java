@@ -1,3 +1,4 @@
+
 package DiogoRangel.Bar.classes;
 
 import DiogoRangel.Bar.enums.TipoItem;
@@ -62,9 +63,9 @@ public class Conta {
 
             if (item != null) {
                 if (item.getTipo() == TipoItem.BEBIDA) {             // bebida
-                    gorjeta += consumo.getValorTotal() * percBebida;
+                    gorjeta += consumo.getValorTotal() * percBebida/100;
                 } else if (item.getTipo() == TipoItem.COMIDA) {      // comida
-                    gorjeta += consumo.getValorTotal() * percComida;
+                    gorjeta += consumo.getValorTotal() * percComida/100;
                 }
             }
         }
