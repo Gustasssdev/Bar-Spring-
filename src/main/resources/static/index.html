@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar System - Acesso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .profile-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* Para usar como link */
+            line-height: 1.5; /* Centraliza o texto */
+        }
+        .profile-button.admin { background-color: #dc3545; }
+        .profile-button.garcom { background-color: #28a745; }
+        .profile-button.cliente { background-color: #ffc107; color: #333;}
+
+        .profile-button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>👋 Bem-vindo ao Bar System</h1>
+    <p>Selecione seu perfil para acessar:</p>
+
+    <a href="admin.html" class="profile-button admin"> Administrador </a>
+    <a href="garcom.html" class="profile-button garcom"> Garçom </a>
+    <a href="cliente.html" class="profile-button cliente"> Cliente </a>
+
+</div>
+</body>
+</html>

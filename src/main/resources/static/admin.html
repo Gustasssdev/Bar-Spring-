@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bar System - Administrador</title>
+    <style>
+        /* Estilos usando paleta de cores para Administrador (vermelho/vinho) */
+        body { font-family: 'Inter', sans-serif; background-color: #f8f8f8; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+        h1 { color: #dc3545; text-align: center; margin-bottom: 25px; border-bottom: 3px solid #dc3545; padding-bottom: 10px; }
+        h2 { color: #dc3545; margin-top: 30px; margin-bottom: 15px; }
+        .section { margin-bottom: 35px; padding: 20px; border: 1px solid #f5c6cb; border-radius: 8px; background-color: #f8d7da; }
+        fieldset { border: 1px solid #dc3545; padding: 15px; border-radius: 6px; margin-top: 15px; }
+        legend { font-weight: bold; color: #dc3545; padding: 0 10px; }
+        label { display: block; margin-top: 10px; font-weight: 600; color: #333; }
+        input[type="number"], input[type="text"], input[type="datetime-local"], select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: #dc3545; outline: none; box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25); }
+
+        button {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: bold;
+        }
+        button:hover { background-color: #c82333; transform: translateY(-1px); }
+
+        .result { white-space: pre-wrap; margin-top: 15px; padding: 15px; border: 1px solid #ccc; background-color: #f8f8f8; border-radius: 6px; font-size: 0.9em; max-height: 300px; overflow-y: auto; }
+        .error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+
+        .logout-btn { position: absolute; top: 20px; right: 20px; background-color: #6c757d; color: white; }
+        .logout-btn:hover { background-color: #5a6268; }
+
+        .form-row { display: flex; gap: 20px; }
+        .form-group { flex: 1; }
+
+        .report-section .form-row {
+            align-items: flex-end; /* Alinha os botões com os campos */
+        }
+    </style>
+</head>
+<body>
+
+<button class="logout-btn" onclick="window.location.href='index.html'">Voltar ao Login</button>
+
+<div class="container">
+    <h1>Área do Administrador</h1>
+
+    <!-- ============================================== -->
+    <!-- 1. ATUALIZAR REGRAS DE NEGÓCIO -->
+    <!-- PUT /api/admin/configuracao -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>1. Configurações de Negócio</h2>
+        <fieldset>
+            <legend>Atualizar Regras (Gorjetas e Couvert)</legend>
+            <form id="configuracaoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precoCouvert">Preço Couvert por Pessoa (R$)</label>
+                        <input type="number" id="precoCouvert" step="0.01" value="5.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="percGorjetaBebida">Gorjeta (%) - Bebidas</label>
+                        <input type="number" id="percGorjetaBebida" step="0.01" value="10.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="percGorjetaComida">Gorjeta (%) - Comidas</label>
+                        <input type="number" id="percGorjetaComida" step="0.01" value="10.0" required>
+                    </div>
+                </div>
+                <button type="submit">Atualizar Configurações</button>
+            </form>
+            <div id="configuracaoResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 2. CADASTRAR MESA -->
+    <!-- POST /api/admin/mesas -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>2. Cadastro de Mesa</h2>
+        <fieldset>
+            <legend>Registrar Nova Mesa Fixa</legend>
+            <form id="cadastrarMesaForm">
+                <div class="form-group">
+                    <label for="numeroMesaCadastrar">Número da Mesa</label>
+                    <input type="number" id="numeroMesaCadastrar" required>
+                </div>
+                <button type="submit">Cadastrar Mesa</button>
+            </form>
+            <div id="cadastrarMesaResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 3. CADASTRAR ITEM CARDÁPIO -->
+    <!-- POST /api/admin/cardapio -->
+    <!-- ============================================== -->
+    <div class="section">
+        <h2>3. Cadastro de Item no Cardápio</h2>
+        <fieldset>
+            <legend>Adicionar Produto ao Menu</legend>
+            <form id="cadastrarItemForm">
+                <div class="form-group">
+                    <label for="nomeItem">Nome do Item</label>
+                    <input type="text" id="nomeItem" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="precoItem">Preço (R$)</label>
+                        <input type="number" id="precoItem" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipoItem">Tipo</label>
+                        <select id="tipoItem" required>
+                            <option value="">Selecione...</option>
+                            <option value="COMIDA">COMIDA</option>
+                            <option value="BEBIDA">BEBIDA</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit">Cadastrar Item</button>
+            </form>
+            <div id="cadastrarItemResult" class="result"></div>
+        </fieldset>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 4. RELATÓRIO DE FATURAMENTO -->
+    <!-- GET /api/admin/relatorio/faturamento -->
+    <!-- ============================================== -->
+    <div class="section report-section">
+        <h2>4. Relatórios</h2>
+        <fieldset>
+            <legend>Faturamento por Período</legend>
+            <form id="faturamentoForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inicio">Data/Hora Início</label>
+                        <input type="datetime-local" id="inicio" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fim">Data/Hora Fim</label>
+                        <input type="datetime-local" id="fim" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit">Gerar Faturamento</button>
+                    </div>
+                </div>
+            </form>
+            <div id="faturamentoResult" class="result"></div>
+        </fieldset>
+    </div>
+
+</div>
+
+<script>
+    const BASE_URL = 'http://localhost:8080/api';
+    const ADMIN_BASE_URL = BASE_URL + '/admin';
+
+    // ===========================================
+    // UTILS
+    // ===========================================
+    function displayResult(elementId, message, isError = false) {
+        const resultDiv = document.getElementById(elementId);
+        resultDiv.textContent = message;
+        resultDiv.className = 'result ' + (isError ? 'error' : 'success');
+        resultDiv.scrollTop = resultDiv.scrollHeight;
+    }
+
+    function formatDateTime(dateTimeLocalString) {
+        // Converte o formato 'YYYY-MM-DDTHH:mm' para 'YYYY-MM-DDTHH:mm:ss' (ISO 8601 completo)
+        if (dateTimeLocalString.length === 16) {
+            return dateTimeLocalString + ':00';
+        }
+        return dateTimeLocalString;
+    }
+
+    // ===========================================
+    // 1. ATUALIZAR REGRAS (PUT /api/admin/configuracao)
+    // ===========================================
+    document.getElementById('configuracaoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const precoCouvert = parseFloat(document.getElementById('precoCouvert').value);
+        const percGorjetaBebida = parseFloat(document.getElementById('percGorjetaBebida').value);
+        const percGorjetaComida = parseFloat(document.getElementById('percGorjetaComida').value);
+
+        displayResult('configuracaoResult', 'Atualizando configurações...', false);
+
+        try {
+            const response = await fetch(`${ADMIN_BASE_URL}/configuracao`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    precoCouvertPorPessoa: precoCouvert,
+                    percentualGorjetaBebida: percGorjetaBebida,
+                    percentualGorjetaComida: percGorjetaComida
+                })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                displayResult('configuracaoResult', `
+✅ Configurações Atualizadas com Sucesso!
+Couvert por Pessoa: R$ ${data.precoCouvertPorPessoa.toFixed(2)}
+Gorjeta Bebida: ${data.percentualGorjetaBebida}%
+Gorjeta Comida: ${data.percentualGorjetaComida}%
+`, false);
+            } else {
+                displayResult('configuracaoResult', '❌ Erro ao atualizar configurações: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('configuracaoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 2. CADASTRAR MESA (POST /api/admin/mesas)
+    // ===========================================
+    document.getElementById('cadastrarMesaForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const numero = parseInt(document.getElementById('numeroMesaCadastrar').value);
+
+        displayResult('cadastrarMesaResult', `Cadastrando mesa ${numero}...`, false);
+
+        try {
+            const response = await fetch(`${ADMIN_BASE_URL}/mesas`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ numero: numero })
+            });
+
+            const data = await response.json();
+            if (response.status === 201) {
+                displayResult('cadastrarMesaResult', `
+✅ Mesa Cadastrada com Sucesso!
+ID: ${data.id}
+Número: ${data.numero}
+Status Conta Ativa: ${data.contaAtiva ? 'Sim' : 'Não'}
+`, false);
+            } else {
+                displayResult('cadastrarMesaResult', '❌ Erro ao cadastrar mesa: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('cadastrarMesaResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 3. CADASTRAR ITEM CARDÁPIO (POST /api/admin/cardapio)
+    // ===========================================
+    document.getElementById('cadastrarItemForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('nomeItem').value;
+        const preco = parseFloat(document.getElementById('precoItem').value);
+        const tipo = document.getElementById('tipoItem').value;
+
+        displayResult('cadastrarItemResult', `Cadastrando item ${nome}...`, false);
+
+        try {
+         const response = await fetch(`${ADMIN_BASE_URL}/item`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }, // <-- ESSA LINHA FOI ADICIONADA/AJUSTADA
+                body: JSON.stringify({ nome, preco, tipo }) // <-- JSON.stringify GARANTE QUE O CORPO É JSON
+            });
+
+            const data = await response.json();
+            if (response.status === 201) {
+                displayResult('cadastrarItemResult', `
+✅ Item Cadastrado com Sucesso!
+ID: ${data.id}
+Nome: ${data.nome}
+Preço: R$ ${data.preco.toFixed(2)}
+Tipo: ${data.tipo}
+`, false);
+            } else {
+                displayResult('cadastrarItemResult', '❌ Erro ao cadastrar item: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('cadastrarItemResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+
+    // ===========================================
+    // 4. GERAR RELATÓRIO FATURAMENTO (GET /api/admin/relatorio/faturamento)
+    // ===========================================
+    document.getElementById('faturamentoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // Garantindo que a data/hora seja formatada corretamente para o Spring Boot
+        const inicio = formatDateTime(document.getElementById('inicio').value);
+        const fim = formatDateTime(document.getElementById('fim').value);
+
+        displayResult('faturamentoResult', 'Gerando relatório de faturamento...', false);
+
+        try {
+            // GET /api/admin/relatorio/faturamento?inicio=...&fim=...
+            const response = await fetch(`${ADMIN_BASE_URL}/relatorio/faturamento?inicio=${inicio}&fim=${fim}`, {
+                method: 'GET'
+            });
+
+            // O endpoint retorna diretamente um Double (o faturamento)
+            const faturamento = await response.text();
+
+            if (response.ok) {
+                displayResult('faturamentoResult', `
+✅ Relatório Concluído!
+Período: ${inicio} a ${fim}
+Faturamento Total: R$ ${parseFloat(faturamento).toFixed(2)}
+`, false);
+            } else {
+                // Tenta ler o body como JSON para erros (se houver)
+                const data = await response.json().catch(() => ({}));
+                displayResult('faturamentoResult', '❌ Erro ao gerar relatório: ' + (data.message || response.statusText), true);
+            }
+        } catch (error) {
+            displayResult('faturamentoResult', '❌ Erro de comunicação com o servidor: ' + error.message, true);
+        }
+    });
+</script>
+</body>
+</html>

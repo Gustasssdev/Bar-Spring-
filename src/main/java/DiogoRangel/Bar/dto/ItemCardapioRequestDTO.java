@@ -1,5 +1,6 @@
 package DiogoRangel.Bar.dto;
 
+import DiogoRangel.Bar.enums.TipoItem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +8,6 @@ import lombok.Setter;
 @Setter
 public class ItemCardapioRequestDTO {
     private String nome;
-    private int tipo;
+    private TipoItem tipo;
     private double preco;
 }

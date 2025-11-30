@@ -1,5 +1,6 @@
 package DiogoRangel.Bar.classes;
 
+import DiogoRangel.Bar.enums.TipoItem;
 import DiogoRangel.Bar.model.Cliente;
 import DiogoRangel.Bar.classes.ItemCardapio;
 import DiogoRangel.Bar.model.Mesa;
@@ -56,9 +57,9 @@ public class Conta {
             ItemCardapio item = consumo.getItem();
 
             if (item != null) {
-                if (item.getTipo() == 2) {             // bebida
+                if (item.getTipo() == TipoItem.BEBIDA) {             // bebida
                     gorjeta += consumo.getValorTotal() * percBebida;
-                } else if (item.getTipo() == 3) {      // comida
+                } else if (item.getTipo() == TipoItem.COMIDA) {      // comida
                     gorjeta += consumo.getValorTotal() * percComida;
                 }
             }

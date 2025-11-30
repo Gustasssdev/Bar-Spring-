@@ -54,7 +54,7 @@ public class AdministradorController {
       //POST /api/admin/cardapio
       //Cadastra um novo item no cardápio.
 
-    @PostMapping("/cardapio")
+    @PostMapping("/item")
     public ResponseEntity<ItemCardapio> cadastrarItem(@RequestBody @Valid ItemCardapioRequestDTO dto) {
         // Cria um objeto ItemCardapio
         ItemCardapio novoItem = new ItemCardapio(dto.getNome(),dto.getPreco(), dto.getTipo());
