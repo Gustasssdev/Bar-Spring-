@@ -1,16 +1,14 @@
 package DiogoRangel.Bar.dto;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 public class CancelarGorjetaResponseDTO {
-    private Long contaId;
-    private String mensagem;
-    private double gorjetaRemovida;
-    private double novoTotalConta;
-    private boolean gorjetaCancelada;
+    private final Long contaId;
+    private final String mensagem;
+    private final double gorjetaRemovida;
+    private final double novoTotalConta;
+    private final boolean gorjetaCancelada;
 
     public CancelarGorjetaResponseDTO(Long contaId, String mensagem, double gorjetaRemovida, 
                                        double novoTotalConta, boolean gorjetaCancelada) {

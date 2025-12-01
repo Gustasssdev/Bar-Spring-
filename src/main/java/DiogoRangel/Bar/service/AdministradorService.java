@@ -4,6 +4,7 @@ import DiogoRangel.Bar.classes.Conta;
 import DiogoRangel.Bar.dto.CancelarGorjetaResponseDTO;
 import DiogoRangel.Bar.dto.ItemFaturamentoDTO;
 import DiogoRangel.Bar.dto.ItemVendaDTO;
+import DiogoRangel.Bar.exception.ConfiguracaoNaoEncontrada;
 import DiogoRangel.Bar.exception.ContaFechada;
 import DiogoRangel.Bar.exception.ContaInexistente;
 import DiogoRangel.Bar.exception.DadosInvalidos;
@@ -103,27 +104,32 @@ public class AdministradorService {
             throw new OperacaoNaoPermitida("A gorjeta desta conta já foi cancelada anteriormente.");
         }
 
-        // 5. Buscar configuração para calcular a gorjeta antes do cancelamento
-        Configuracao config = configRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("Configuração do sistema não encontrada."));
+        // 5. Verificar se a conta tem mesa associada
+        if (conta.getMesa() == null) {
+            throw new DadosInvalidos("A conta não possui uma mesa associada.");
+        }
 
-        // 6. Calcular o valor da gorjeta que será removida (antes de cancelar)
+        // 6. Buscar configuração para calcular a gorjeta antes do cancelamento
+        Configuracao config = configRepository.findById(1L)
+                .orElseThrow(() -> new ConfiguracaoNaoEncontrada("Configuração do sistema não encontrada."));
+
+        // 7. Calcular o valor da gorjeta que será removida (antes de cancelar)
         double gorjetaRemovida = conta.calcularGorjeta(
                 config.getPercentualGorjetaBebida(),
                 config.getPercentualGorjetaComida()
         );
 
-        // 7. Cancelar a gorjeta
+        // 8. Cancelar a gorjeta
         conta.setGorjetaCancelada(true);
         contaRepository.save(conta);
 
-        // 8. Calcular o novo total da conta (sem gorjeta)
+        // 9. Calcular o novo total da conta (sem gorjeta)
         int numPessoas = conta.getMesa().getNumPessoas();
         double totalItens = conta.calcularTotalConsumido();
         double couvert = config.getPrecoCouvertPorPessoa() * numPessoas;
         double novoTotal = totalItens + couvert; // Gorjeta agora é 0
 
-        // 9. Retornar resposta
+        // 10. Retornar resposta
         return new CancelarGorjetaResponseDTO(
                 contaId,
                 "Gorjeta cancelada com sucesso.",
