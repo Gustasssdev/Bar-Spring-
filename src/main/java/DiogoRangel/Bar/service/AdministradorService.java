@@ -1,8 +1,13 @@
 package DiogoRangel.Bar.service;
 
+import DiogoRangel.Bar.classes.Conta;
+import DiogoRangel.Bar.dto.CancelarGorjetaResponseDTO;
 import DiogoRangel.Bar.dto.ItemFaturamentoDTO;
 import DiogoRangel.Bar.dto.ItemVendaDTO;
+import DiogoRangel.Bar.exception.ContaFechada;
+import DiogoRangel.Bar.exception.ContaInexistente;
 import DiogoRangel.Bar.exception.DadosInvalidos;
+import DiogoRangel.Bar.exception.OperacaoNaoPermitida;
 import DiogoRangel.Bar.model.Configuracao;
 import DiogoRangel.Bar.model.Mesa;
 import DiogoRangel.Bar.classes.ItemCardapio;
@@ -70,5 +75,62 @@ public class AdministradorService {
         return consumoRepository.findItensComMaiorFaturamento();
     }
 
+    /**
+     * Cancela a gorjeta de uma conta específica.
+     * Apenas contas com ticket = 1 (entrada paga) podem ter a gorjeta cancelada.
+     * Apenas administradores podem executar esta ação.
+     * 
+     * @param contaId ID da conta
+     * @return DTO com informações sobre o cancelamento
+     */
+    public CancelarGorjetaResponseDTO cancelarGorjeta(Long contaId) {
+        // 1. Buscar a conta
+        Conta conta = contaRepository.findById(contaId)
+                .orElseThrow(() -> new ContaInexistente("Conta não encontrada."));
+
+        // 2. Verificar se a conta está aberta (não permitir cancelamento em conta fechada)
+        if (!conta.isEstaAberta()) {
+            throw new ContaFechada("Não é possível cancelar a gorjeta de uma conta já fechada.");
+        }
+
+        // 3. Verificar se a conta possui ticket = 1 (entrada paga)
+        if (conta.getTicket() != 1) {
+            throw new OperacaoNaoPermitida("Apenas contas com entrada paga (ticket = 1) podem ter a gorjeta cancelada.");
+        }
+
+        // 4. Verificar se a gorjeta já foi cancelada
+        if (conta.isGorjetaCancelada()) {
+            throw new OperacaoNaoPermitida("A gorjeta desta conta já foi cancelada anteriormente.");
+        }
+
+        // 5. Buscar configuração para calcular a gorjeta antes do cancelamento
+        Configuracao config = configRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Configuração do sistema não encontrada."));
+
+        // 6. Calcular o valor da gorjeta que será removida (antes de cancelar)
+        double gorjetaRemovida = conta.calcularGorjeta(
+                config.getPercentualGorjetaBebida(),
+                config.getPercentualGorjetaComida()
+        );
+
+        // 7. Cancelar a gorjeta
+        conta.setGorjetaCancelada(true);
+        contaRepository.save(conta);
+
+        // 8. Calcular o novo total da conta (sem gorjeta)
+        int numPessoas = conta.getMesa().getNumPessoas();
+        double totalItens = conta.calcularTotalConsumido();
+        double couvert = config.getPrecoCouvertPorPessoa() * numPessoas;
+        double novoTotal = totalItens + couvert; // Gorjeta agora é 0
+
+        // 9. Retornar resposta
+        return new CancelarGorjetaResponseDTO(
+                contaId,
+                "Gorjeta cancelada com sucesso.",
+                gorjetaRemovida,
+                novoTotal,
+                true
+        );
+    }
 
 }
