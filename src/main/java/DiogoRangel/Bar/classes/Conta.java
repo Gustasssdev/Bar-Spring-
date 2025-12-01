@@ -47,6 +47,14 @@ public class Conta {
     @Column(name = "data_fechamento") // NOVO CAMPO
     private LocalDateTime dataFechamento;
 
+    // ticket = 0: entrada gratuita, ticket = 1: entrada paga
+    @Column(name = "ticket")
+    private int ticket = 0;
+
+    // Indica se a gorjeta foi cancelada para esta conta
+    @Column(name = "gorjeta_cancelada")
+    private boolean gorjetaCancelada = false;
+
     public Conta() {}
 
     public Conta(int numConta, Cliente cliente, Mesa mesa) {
@@ -57,6 +65,11 @@ public class Conta {
     }
 
     public double calcularGorjeta(double percBebida, double percComida) {
+        // Se a gorjeta foi cancelada, retorna 0
+        if (gorjetaCancelada) {
+            return 0.0;
+        }
+        
         double gorjeta = 0.0;
         for (Consumo consumo : consumos) {
             ItemCardapio item = consumo.getItem();

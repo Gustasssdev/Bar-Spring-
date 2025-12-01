@@ -1,5 +1,6 @@
 package DiogoRangel.Bar.controller;
 
+import DiogoRangel.Bar.dto.CancelarGorjetaResponseDTO;
 import DiogoRangel.Bar.dto.ConfiguracaoRequestDTO;
 import DiogoRangel.Bar.dto.ItemFaturamentoDTO;
 import DiogoRangel.Bar.dto.MesaRequestDTO;
@@ -73,5 +74,19 @@ public class AdministradorController {
     public ResponseEntity<List<ItemFaturamentoDTO>> relatorioItensMaiorFaturamento() {
         return ResponseEntity.ok(administradorService.gerarRelatorioItensMaiorFaturamento());
 
+    }
+
+    /**
+     * Cancela a gorjeta de uma conta específica.
+     * Apenas contas com ticket = 1 (entrada paga) podem ter a gorjeta cancelada.
+     * Esta operação é restrita a administradores.
+     * 
+     * @param id ID da conta
+     * @return Resposta com informações do cancelamento
+     */
+    @PutMapping("/contas/{id}/cancelar-gorjeta")
+    public ResponseEntity<CancelarGorjetaResponseDTO> cancelarGorjeta(@PathVariable Long id) {
+        CancelarGorjetaResponseDTO response = administradorService.cancelarGorjeta(id);
+        return ResponseEntity.ok(response);
     }
 }
